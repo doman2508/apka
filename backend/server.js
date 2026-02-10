@@ -78,8 +78,8 @@ app.get('/api/materials-summary', async (_req, res) => {
         m.Reference,
         m.Name,
         COALESCE(SUM(TRY_CONVERT(decimal(18, 2), lu.Quantity)), 0) AS TotalQuantity
-      FROM dbo_Materials m
-      LEFT JOIN dbo_LogisticUnits lu ON lu.material = m.id
+      FROM Materials m
+      LEFT JOIN LogisticUnits lu ON lu.material = m.id
       GROUP BY m.id, m.Reference, m.Name
       ORDER BY m.Name ASC;
     `);

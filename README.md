@@ -1,9 +1,9 @@
 # WMS Materials Summary App
 
 Simple React + Tailwind UI with an Express API that connects to SQL Server and returns:
-- `Reference` and `Name` from `dbo_Materials`
-- `SUM(Quantity)` from `dbo_LogisticUnits`
-- Joined on `dbo_LogisticUnits.material = dbo_Materials.id`
+- `Reference` and `Name` from `Materials`
+- `SUM(Quantity)` from `LogisticUnits`
+- Joined on `LogisticUnits.material = Materials.id`
 
 ## Project structure
 
@@ -60,8 +60,8 @@ SELECT
   m.Reference,
   m.Name,
   COALESCE(SUM(TRY_CONVERT(decimal(18, 2), lu.Quantity)), 0) AS TotalQuantity
-FROM dbo_Materials m
-LEFT JOIN dbo_LogisticUnits lu ON lu.material = m.id
+FROM Materials m
+LEFT JOIN LogisticUnits lu ON lu.material = m.id
 GROUP BY m.id, m.Reference, m.Name
 ORDER BY m.Name ASC;
 ```
