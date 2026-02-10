@@ -16,7 +16,15 @@ Simple React + Tailwind UI with an Express API that connects to SQL Server and r
    ```bash
    npm run install:all
    ```
-2. Configure SQL connection by copying `backend/.env.example` to `backend/.env` and adjusting if needed.
+2. Configure SQL connection by copying `backend/.env.example` to `backend/.env`.
+
+   You can use either:
+   - `SQL_SERVER=192.168.1.10,1433\WEAVER` (single string), or
+   - `SQL_HOST`, `SQL_PORT`, and optional `SQL_INSTANCE` fields.
+
+   > Important: SQL Server drivers treat `port` and `instanceName` as mutually exclusive.
+   > If `SQL_PORT` is set, the backend will prefer port-based connection and ignore instance.
+
 3. Run API:
    ```bash
    npm run dev:backend
@@ -25,6 +33,16 @@ Simple React + Tailwind UI with an Express API that connects to SQL Server and r
    ```bash
    npm run dev:frontend
    ```
+
+## Connectivity check
+
+Use this endpoint to quickly diagnose SQL connection settings:
+
+```bash
+curl http://localhost:3001/api/health
+```
+
+It returns current server/port/instance/database values used by the backend.
 
 ## API endpoint
 
