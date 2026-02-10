@@ -1,10 +1,19 @@
 import { useEffect, useMemo, useState } from 'react';
 
+const apiBaseUrl = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+
 function formatQuantity(value) {
   return new Intl.NumberFormat('en-US', {
     minimumFractionDigits: 0,
     maximumFractionDigits: 2,
   }).format(value ?? 0);
+}
+
+function buildApiUrl(path) {
+  if (!apiBaseUrl) {
+    return path;
+  }
+  return `${apiBaseUrl}${path}`;
 }
 
 export default function App() {
@@ -17,14 +26,23 @@ export default function App() {
     const loadData = async () => {
       setLoading(true);
       setError('');
+
       try {
-        const response = await fetch('/api/materials-summary');
+        const response = await fetch(buildApiUrl('/api/materials-summary'));
+        const payload = await response.json().catch(() => null);
+
         if (!response.ok) {
-          throw new Error(`Server error: ${response.status}`);
+          const message = payload?.details || payload?.message || `Server error: ${response.status}`;
+          throw new Error(message);
         }
-        const data = await response.json();
-        setRows(data);
+
+        if (!Array.isArray(payload)) {
+          throw new Error('Unexpected API response format (expected array).');
+        }
+
+        setRows(payload);
       } catch (err) {
+        setRows([]);
         setError(err instanceof Error ? err.message : 'Failed to fetch data');
       } finally {
         setLoading(false);
@@ -39,7 +57,7 @@ export default function App() {
     if (!normalizedFilter) {
       return rows;
     }
-    return rows.filter((row) => row.Name.toLowerCase().includes(normalizedFilter));
+    return rows.filter((row) => (row?.Name || '').toLowerCase().includes(normalizedFilter));
   }, [rows, filter]);
 
   return (

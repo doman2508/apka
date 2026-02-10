@@ -25,24 +25,28 @@ Simple React + Tailwind UI with an Express API that connects to SQL Server and r
    > Important: SQL Server drivers treat `port` and `instanceName` as mutually exclusive.
    > If `SQL_PORT` is set, the backend will prefer port-based connection and ignore instance.
 
-3. Run API:
+3. (Optional) If frontend is served from a different host/port, set API base URL:
+   ```bash
+   echo 'VITE_API_BASE_URL=http://localhost:3001' > frontend/.env
+   ```
+
+4. Run API:
    ```bash
    npm run dev:backend
    ```
-4. Run UI (new terminal):
+5. Run UI (new terminal):
    ```bash
    npm run dev:frontend
    ```
 
 ## Connectivity check
 
-Use this endpoint to quickly diagnose SQL connection settings:
+Use these endpoints to diagnose SQL connection and query issues:
 
 ```bash
 curl http://localhost:3001/api/health
+curl http://localhost:3001/api/materials-summary
 ```
-
-It returns current server/port/instance/database values used by the backend.
 
 ## API endpoint
 
@@ -55,7 +59,7 @@ SELECT
   m.id AS Id,
   m.Reference,
   m.Name,
-  COALESCE(SUM(lu.Quantity), 0) AS TotalQuantity
+  COALESCE(SUM(TRY_CONVERT(decimal(18, 2), lu.Quantity)), 0) AS TotalQuantity
 FROM dbo_Materials m
 LEFT JOIN dbo_LogisticUnits lu ON lu.material = m.id
 GROUP BY m.id, m.Reference, m.Name
